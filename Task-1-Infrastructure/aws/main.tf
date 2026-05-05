@@ -1,12 +1,8 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_vpc" "main" {
   cidr_block = "10.100.0.0/16"
 }
 
-# Public subnets
+# Public Subnets
 resource "aws_subnet" "public1" {
   vpc_id = aws_vpc.main.id
   cidr_block = "10.100.1.0/24"
@@ -19,15 +15,10 @@ resource "aws_subnet" "public2" {
   map_public_ip_on_launch = true
 }
 
-# Private subnets
+# Private Subnets
 resource "aws_subnet" "private1" {
   vpc_id = aws_vpc.main.id
   cidr_block = "10.100.3.0/24"
-}
-
-resource "aws_subnet" "private2" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.100.4.0/24"
 }
 
 # IGW
@@ -35,40 +26,34 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 }
 
-# Elastic IP for NAT
+# NAT
 resource "aws_eip" "nat" {
   domain = "vpc"
 }
 
-# NAT Gateway
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public1.id
+  subnet_id = aws_subnet.public1.id
 }
 
 # Route Tables
-resource "aws_route_table" "public_rt" {
+resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 }
 
-resource "aws_route" "public_route" {
-  route_table_id = aws_route_table.public_rt.id
-  gateway_id = aws_internet_gateway.igw.id
+resource "aws_route" "public" {
+  route_table_id = aws_route_table.public.id
   destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.igw.id
 }
 
 resource "aws_route_table_association" "pub1" {
   subnet_id = aws_subnet.public1.id
-  route_table_id = aws_route_table.public_rt.id
-}
-
-resource "aws_route_table_association" "pub2" {
-  subnet_id = aws_subnet.public2.id
-  route_table_id = aws_route_table.public_rt.id
+  route_table_id = aws_route_table.public.id
 }
 
 # Security Group
-resource "aws_security_group" "web_sg" {
+resource "aws_security_group" "web" {
   vpc_id = aws_vpc.main.id
 
   ingress {
@@ -93,18 +78,18 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-# Key pair
+# Key Pair
 resource "aws_key_pair" "key" {
   key_name = "capstone-key"
   public_key = file("~/.ssh/id_rsa.pub")
 }
 
-# EC2 instances
+# EC2
 resource "aws_instance" "app" {
   ami = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
   subnet_id = aws_subnet.public1.id
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  vpc_security_group_ids = [aws_security_group.web.id]
   key_name = aws_key_pair.key.key_name
 }
 
@@ -112,6 +97,6 @@ resource "aws_instance" "tools" {
   ami = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
   subnet_id = aws_subnet.public2.id
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  vpc_security_group_ids = [aws_security_group.web.id]
   key_name = aws_key_pair.key.key_name
 }
