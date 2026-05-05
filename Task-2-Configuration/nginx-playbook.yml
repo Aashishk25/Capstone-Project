@@ -1,0 +1,21 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Verify nginx
+      command: systemctl status nginx
+      register: output
+
+    - debug:
+        var: output.stdout
