@@ -2,8 +2,9 @@
   become: yes
   tasks:
     - copy:
-        src: index-aws.html
+        src: Task-3-Deployment/index-aws.html
         dest: /var/www/html/index.html
+        mode: '0644'
 
     - service:
         name: nginx
@@ -13,8 +14,9 @@
   become: yes
   tasks:
     - copy:
-        src: index-azure.html
+        src: Task-3-Deployment/index-azure.html
         dest: /var/www/html/index.html
+        mode: '0644'
 
     - service:
         name: nginx
