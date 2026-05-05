@@ -20,3 +20,7 @@
 
 - debug:
     var: nginx_status.stdout
+
+pre_tasks:
+  - name: Install python
+    raw: apt update && apt install -y python3
