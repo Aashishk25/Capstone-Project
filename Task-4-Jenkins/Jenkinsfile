@@ -4,7 +4,13 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/Capstone-Project/Capstone-Project.git'
+                git 'https://github.com/Aashishk25/Capstone-Project.git'
+            }
+        }
+
+        stage('Debug') {
+            steps {
+                sh 'pwd && ls -R'
             }
         }
 
@@ -24,6 +30,15 @@ pipeline {
             steps {
                 sh 'ansible-playbook -i Task-2-Configuration/inventory.ini Task-3-Deployment/nginx-deploy.yml --limit azure'
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment successful"
+        }
+        failure {
+            echo "Deployment failed"
         }
     }
 }
