@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 }
 
 # 🔹 Get latest Ubuntu AMI dynamically
@@ -15,31 +15,51 @@ data "aws_ami" "ubuntu" {
 
 # VPC
 resource "aws_vpc" "main" {
-  cidr_block = "10.100.0.0/16"
+  cidr_block = var.vpc_cidr
+
+  tags = {
+    Name = "capstone-vpc"
+  }
 }
 
 # Public Subnets
 resource "aws_subnet" "public1" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.100.1.0/24"
+  cidr_block              = var.public_subnet_1
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet-1"
+  }
 }
 
 resource "aws_subnet" "public2" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.100.2.0/24"
+  cidr_block              = var.public_subnet_2
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet-2"
+  }
 }
 
 # Private Subnet
 resource "aws_subnet" "private1" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = "10.100.3.0/24"
+  cidr_block = var.private_subnet_1
+
+  tags = {
+    Name = "private-subnet-1"
+  }
 }
 
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "capstone-igw"
+  }
 }
 
 # Elastic IP for NAT
@@ -53,11 +73,19 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.public1.id
 
   depends_on = [aws_internet_gateway.igw]
+
+  tags = {
+    Name = "capstone-nat"
+  }
 }
 
 # Public Route Table
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "public-rt"
+  }
 }
 
 resource "aws_route" "public_route" {
@@ -79,6 +107,10 @@ resource "aws_route_table_association" "pub2" {
 # Private Route Table
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "private-rt"
+  }
 }
 
 resource "aws_route" "private_route" {
@@ -116,21 +148,25 @@ resource "aws_security_group" "web" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "web-sg"
+  }
 }
 
 # Key Pair
 resource "aws_key_pair" "key" {
-  key_name   = "capstone-key"
+  key_name   = var.key_name
   public_key = file("~/.ssh/id_rsa.pub")
 }
 
 # EC2 - App Machine
 resource "aws_instance" "app" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = "t2.micro"
-  subnet_id                   = aws_subnet.public1.id
-  vpc_security_group_ids      = [aws_security_group.web.id]
-  key_name                    = aws_key_pair.key.key_name
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  subnet_id              = aws_subnet.public1.id
+  vpc_security_group_ids = [aws_security_group.web.id]
+  key_name               = aws_key_pair.key.key_name
 
   tags = {
     Name = "App-Machine"
@@ -139,11 +175,11 @@ resource "aws_instance" "app" {
 
 # EC2 - Tools Machine
 resource "aws_instance" "tools" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = "t2.micro"
-  subnet_id                   = aws_subnet.public2.id
-  vpc_security_group_ids      = [aws_security_group.web.id]
-  key_name                    = aws_key_pair.key.key_name
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  subnet_id              = aws_subnet.public2.id
+  vpc_security_group_ids = [aws_security_group.web.id]
+  key_name               = aws_key_pair.key.key_name
 
   tags = {
     Name = "Tools-Machine"
