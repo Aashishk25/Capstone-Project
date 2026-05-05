@@ -1,0 +1,21 @@
+- hosts: aws
+  become: yes
+  tasks:
+    - copy:
+        src: index-aws.html
+        dest: /var/www/html/index.html
+
+    - service:
+        name: nginx
+        state: restarted
+
+- hosts: azure
+  become: yes
+  tasks:
+    - copy:
+        src: index-azure.html
+        dest: /var/www/html/index.html
+
+    - service:
+        name: nginx
+        state: restarted
