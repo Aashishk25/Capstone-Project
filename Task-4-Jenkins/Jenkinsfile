@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone') {
+            steps {
+                git 'https://github.com/Capstone-Project/Capstone-Project.git'
+            }
+        }
+
+        stage('Configure') {
+            steps {
+                sh 'ansible-playbook -i Task-2-Configuration/inventory.ini Task-2-Configuration/nginx-playbook.yml'
+            }
+        }
+
+        stage('Deploy AWS') {
+            steps {
+                sh 'ansible-playbook -i Task-2-Configuration/inventory.ini Task-3-Deployment/nginx-deploy.yml --limit aws'
+            }
+        }
+
+        stage('Deploy Azure') {
+            steps {
+                sh 'ansible-playbook -i Task-2-Configuration/inventory.ini Task-3-Deployment/nginx-deploy.yml --limit azure'
+            }
+        }
+    }
+}
