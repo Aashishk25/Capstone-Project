@@ -13,3 +13,10 @@
         name: nginx
         state: started
         enabled: yes
+        
+    - name: Check nginx status
+      command: systemctl status nginx
+      register: nginx_status
+
+- debug:
+    var: nginx_status.stdout
