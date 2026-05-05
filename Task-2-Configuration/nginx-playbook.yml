@@ -1,5 +1,6 @@
 - hosts: all
   become: yes
+
   tasks:
     - name: Install nginx
       apt:
@@ -7,15 +8,8 @@
         state: present
         update_cache: yes
 
-    - name: Start nginx
+    - name: Ensure nginx running
       service:
         name: nginx
         state: started
         enabled: yes
-
-    - name: Verify nginx
-      command: systemctl status nginx
-      register: output
-
-    - debug:
-        var: output.stdout
