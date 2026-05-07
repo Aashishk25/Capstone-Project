@@ -21,10 +21,16 @@ variable "private_subnet_1" {
 }
 
 variable "instance_type" {
-  default = "t2.micro"
+  default = "t3.micro"
 }
 
 variable "key_name" {
   description = "SSH key name"
   default     = "capstone-key"
+}
+
+variable "public_key_path" {
+  description = "Path to SSH public key"
+  type        = string
+  default     = "~/.ssh/id_ed25519.pub"
 }
