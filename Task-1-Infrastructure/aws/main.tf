@@ -1,7 +1,3 @@
-provider "aws" {
-  region = var.aws_region
-}
-
 # 🔹 Get latest Ubuntu AMI dynamically
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -157,7 +153,7 @@ resource "aws_security_group" "web" {
 # Key Pair
 resource "aws_key_pair" "key" {
   key_name   = var.key_name
-  public_key = file("~/.ssh/id_rsa.pub")
+  public_key = file(pathexpand(var.public_key_path))
 }
 
 # EC2 - App Machine
