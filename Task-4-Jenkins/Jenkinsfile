@@ -3,10 +3,10 @@ pipeline {
 
     stages {
         stage('Clone') {
-            steps {
-                git 'https://github.com/Aashishk25/Capstone-Project.git'
-            }
-        }
+    steps {
+        git branch: 'main', url: 'https://github.com/Aashishk25/Capstone-Project.git'
+    }
+}
 
         stage('Debug') {
             steps {

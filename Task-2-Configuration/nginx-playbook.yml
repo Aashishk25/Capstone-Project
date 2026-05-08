@@ -1,26 +1,20 @@
-- hosts: all
+---
+- name: Install and Start Nginx
+  hosts: all
   become: yes
 
   tasks:
-    - name: Install nginx
+    - name: Update apt packages
+      apt:
+        update_cache: yes
+
+    - name: Install Nginx
       apt:
         name: nginx
         state: present
-        update_cache: yes
 
-    - name: Ensure nginx running
+    - name: Start and Enable Nginx
       service:
         name: nginx
         state: started
         enabled: yes
-        
-    - name: Check nginx status
-      command: systemctl status nginx
-      register: nginx_status
-
-- debug:
-    var: nginx_status.stdout
-
-pre_tasks:
-  - name: Install python
-    raw: apt update && apt install -y python3

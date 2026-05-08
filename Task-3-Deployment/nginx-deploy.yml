@@ -1,23 +1,17 @@
 - hosts: aws
   become: yes
-  tasks:
-    - copy:
-        src: Task-3-Deployment/index-aws.html
-        dest: /var/www/html/index.html
-        mode: '0644'
 
-    - service:
-        name: nginx
-        state: restarted
+  tasks:
+    - name: Deploy AWS index page
+      copy:
+        src: index-aws.html
+        dest: /var/www/html/index.html
 
 - hosts: azure
   become: yes
-  tasks:
-    - copy:
-        src: Task-3-Deployment/index-azure.html
-        dest: /var/www/html/index.html
-        mode: '0644'
 
-    - service:
-        name: nginx
-        state: restarted
+  tasks:
+    - name: Deploy Azure index page
+      copy:
+        src: index-azure.html
+        dest: /var/www/html/index.html
